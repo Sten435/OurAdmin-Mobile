@@ -9,18 +9,15 @@ class QueryRepo {
 
   Future<QueryResult> executeQuery(String text) async {
     final conn = await MySQLConnection.createConnection(
-      host: "localhost",
+      host: "10.0.2.2",
       port: 3306,
       userName: "root",
-      password: "",
-      databaseName: "ouradmin",
+      password: "root",
+      databaseName: "test",
     );
 
     await conn.connect();
 
-    print("Connected");
-
-    // update some rows
     var res = await conn.execute(text, {}, true);
     return QueryResult(hasData: true, results: await res.rowsStream.toList());
   }

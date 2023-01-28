@@ -1,8 +1,9 @@
-import 'package:another_flushbar/flushbar.dart';
 import 'package:code_text_field/code_text_field.dart';
 import 'package:flutter/material.dart';
-import 'package:ouradmin_mobile/manager/query_manader.dart';
-import 'package:ouradmin_mobile/views/query_view/widgets/results_popup.dart';
+
+import '../../manager/query_manader.dart';
+import '../alert_popups/error_popups.dart';
+import 'widgets/results_popup.dart';
 
 class QueryView extends StatefulWidget {
   String queryText = "";
@@ -285,29 +286,12 @@ class _QueryViewState extends State<QueryView> {
       showBottomSheet(
           context: context,
           backgroundColor: Theme.of(context).colorScheme.background,
+          enableDrag: false,
           builder: (context) {
             return ResultPopup(queryResult);
           });
     } catch (e) {
-      print(e);
-      Flushbar(
-        messageText: Text(
-          e.toString(),
-          style: const TextStyle(
-            fontSize: 18.0,
-            color: Colors.red,
-          ),
-        ),
-        icon: const Icon(
-          Icons.info,
-          size: 28.0,
-          color: Colors.red,
-        ),
-        duration: const Duration(seconds: 5),
-        showProgressIndicator: true,
-        backgroundColor: Colors.black,
-        leftBarIndicatorColor: Colors.red,
-      ).show(context);
+      showErrorBar(context, e.toString());
     }
   }
 }

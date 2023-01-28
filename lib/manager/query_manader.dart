@@ -8,12 +8,7 @@ class QueryManager {
   static Future<QueryResult> executeQuery(String? text) async {
     try {
       if (text?.isEmpty ?? true) throw Exception('Geen query ingevoerd');
-      var result = await _queryRepo.executeQuery(text!.trim());
-      if (result != null) {
-        return result;
-      } else {
-        throw "Error while fetching result";
-      }
+      return await _queryRepo.executeQuery(text!.trim());
     } catch (e) {
       rethrow;
     }

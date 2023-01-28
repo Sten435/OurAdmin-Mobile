@@ -1,9 +1,9 @@
-import 'package:another_flushbar/flushbar.dart';
 import 'package:flutter/material.dart';
 import 'package:ouradmin_mobile/domein/enums/db_key_type.dart';
 
 import '../../domein/column.dart';
 import '../../manager/structuur_manager.dart';
+import '../alert_popups/error_popups.dart';
 import 'widgets/custom_checkbox.dart';
 import 'widgets/custom_combo_box.dart';
 
@@ -17,7 +17,8 @@ class StructuurView extends StatefulWidget {
 class _StructuurViewState extends State<StructuurView> {
   final List<DBColumn> columns = List<DBColumn>.generate(
     10,
-    (i) => DBColumn("Name: ${i + 1}", "Type: ${i + 1}", keyType: null, isNullable: true),
+    (i) => DBColumn("Name: ${i + 1}", "Type: ${i + 1}",
+        keyType: null, isNullable: true),
   );
 
   final typeNames = List<String>.generate(10, (i) => "Type: ${i + 1}");
@@ -30,7 +31,9 @@ class _StructuurViewState extends State<StructuurView> {
         color: Colors.white,
         borderRadius: BorderRadius.circular(4),
         border: Border.all(
-          color: selectedIndex == index ? Colors.brown.shade500 : Colors.transparent,
+          color: selectedIndex == index
+              ? Colors.brown.shade500
+              : Colors.transparent,
           width: 2,
         ),
         boxShadow: [
@@ -52,9 +55,13 @@ class _StructuurViewState extends State<StructuurView> {
             }
           });
         },
-        title: Text(column.Name, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+        title: Text(column.Name,
+            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
         subtitle: Text(
-          "${column.Type},${column.KeyType?.name ?? ""},${column.IsNullable == true ? "null" : ""}".split(",").where((s) => s.isNotEmpty).join(" - "),
+          "${column.Type},${column.KeyType?.name ?? ""},${column.IsNullable == true ? "null" : ""}"
+              .split(",")
+              .where((s) => s.isNotEmpty)
+              .join(" - "),
         ),
         trailing: selectedIndex == index
             ? RawMaterialButton(
@@ -86,11 +93,13 @@ class _StructuurViewState extends State<StructuurView> {
               ),
               if (selectedIndex != null)
                 ElevatedButton(
-                  style: ElevatedButton.styleFrom(backgroundColor: Colors.orange.shade600),
+                  style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.orange.shade600),
                   onPressed: () {
                     columnDialog(column: columns[selectedIndex!]);
                   },
-                  child: const Text('Edit Column', style: TextStyle(fontSize: 20)),
+                  child:
+                      const Text('Edit Column', style: TextStyle(fontSize: 20)),
                 ),
             ],
           ),
@@ -177,18 +186,7 @@ class _StructuurViewState extends State<StructuurView> {
                     }
                   }
 
-                  Flushbar(
-                    message: message,
-                    icon: const Icon(
-                      Icons.info,
-                      size: 28.0,
-                      color: Colors.orange,
-                    ),
-                    duration: const Duration(seconds: 3),
-                    showProgressIndicator: true,
-                    backgroundColor: Colors.black,
-                    leftBarIndicatorColor: Colors.orange,
-                  ).show(context);
+                  showWarningBar(context, message);
                 },
                 child: Text(column == null ? 'Add' : 'Edit'),
               ),
@@ -216,7 +214,8 @@ class _StructuurViewState extends State<StructuurView> {
                             }
                             return null;
                           },
-                          decoration: const InputDecoration(border: OutlineInputBorder(), labelText: 'Name'),
+                          decoration: const InputDecoration(
+                              border: OutlineInputBorder(), labelText: 'Name'),
                         ),
                         const SizedBox(height: 20),
                         CustomComboBox(
@@ -232,10 +231,15 @@ class _StructuurViewState extends State<StructuurView> {
                           DBKeyType.values.map((e) => e.name).toList(),
                           placeholder: "Key",
                           borderText: "Key",
-                          onChanged: (value) => setState(() => keyType = DBKeyType.values.firstWhere((element) => element.name == value)),
+                          onChanged: (value) => setState(() => keyType =
+                              DBKeyType.values.firstWhere(
+                                  (element) => element.name == value)),
                         ),
                         const SizedBox(height: 20),
-                        CustomCheckBox("Nullable", defaultValue: isNullable, onChanged: (value) => setState(() => isNullable = value)),
+                        CustomCheckBox("Nullable",
+                            defaultValue: isNullable,
+                            onChanged: (value) =>
+                                setState(() => isNullable = value)),
                       ],
                     ),
                   ),
@@ -254,7 +258,8 @@ class _StructuurViewState extends State<StructuurView> {
         Expanded(
           child: ListView.builder(
             itemCount: columns.length,
-            itemBuilder: (context, index) => columnListTile(index, columns[index]),
+            itemBuilder: (context, index) =>
+                columnListTile(index, columns[index]),
           ),
         ),
         footerButtons(),
