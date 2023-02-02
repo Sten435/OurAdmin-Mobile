@@ -1,4 +1,3 @@
 enum DBKeyType {
-  PrimaryKey,
-  ForeignKey,
+  primaryKey,
 }

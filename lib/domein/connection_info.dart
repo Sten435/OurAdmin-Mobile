@@ -2,10 +2,17 @@
 import 'dart:convert';
 
 class ConnectionInfo {
-  late String host;
-  late int port;
-  late String username;
-  late String password;
+  late String _host;
+  String get host => _host;
+
+  late int _port;
+  int get port => _port;
+
+  late String _username;
+  String get username => _username;
+
+  late String _password;
+  String get password => _password;
 
   ConnectionInfo(host, port, username, password) {
     setHost(host);
@@ -14,25 +21,33 @@ class ConnectionInfo {
     setPassword(password);
   }
 
+// #region: Host
   void setHost(String host) {
     if (host.isEmpty) throw Exception('Host cannot be empty');
-    this.host = host;
+    _host = host;
   }
+// #endregion
 
+// #region: Username
   void setUsername(String username) {
     if (username.isEmpty) throw Exception('Username cannot be empty');
-    this.username = username;
+    _username = username;
   }
+// #endregion
 
+// #region: Password
   void setPassword(String password) {
     if (password.isEmpty) throw Exception('Password cannot be empty');
-    this.password = password;
+    _password = password;
   }
+// #endregion
 
+// #region: Port
   void setPort(int port) {
     if (port < 0) throw Exception('Port must be a positive number');
-    this.port = port;
+    _port = port;
   }
+// #endregion
 
 // #region: Mappers
   Map<String, dynamic> toMap() {
@@ -55,27 +70,6 @@ class ConnectionInfo {
 
   String toJson() => json.encode(toMap());
 
-  factory ConnectionInfo.fromJson(String source) =>
-      ConnectionInfo.fromMap(json.decode(source) as Map<String, dynamic>);
-// #endregion
-
-// #region: Equals
-  @override
-  bool operator ==(covariant ConnectionInfo other) {
-    if (identical(this, other)) return true;
-
-    return other.host == host &&
-        other.port == port &&
-        other.username == username &&
-        other.password == password;
-  }
-
-  @override
-  int get hashCode {
-    return host.hashCode ^
-        port.hashCode ^
-        username.hashCode ^
-        password.hashCode;
-  }
+  factory ConnectionInfo.fromJson(String source) => ConnectionInfo.fromMap(json.decode(source) as Map<String, dynamic>);
 // #endregion
 }

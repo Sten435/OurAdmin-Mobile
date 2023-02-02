@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ouradmin_mobile/router/router.dart';
 
+import 'custom_drawer_list_tile.dart';
+
 class CustomDrawer extends StatefulWidget {
   const CustomDrawer({
     Key? key,
@@ -46,37 +48,9 @@ class _CustomDrawerState extends State<CustomDrawer> {
             color: Colors.white24,
             thickness: 2,
           ),
-          ...routesDictionary.entries
-              .map((route) => CustomListTile(route: route))
-              .toList()
+          ...routesDictionary.entries.map((route) => CustomDrawerListTile(route: route, selected: GoRouter.of(context).location == "/${route.key.name}")).toList()
         ],
       ),
     );
-  }
-}
-
-class CustomListTile extends StatelessWidget {
-  const CustomListTile({
-    required this.route,
-    Key? key,
-  }) : super(key: key);
-
-  final MapEntry<ERoutes, IconData> route;
-
-  @override
-  Widget build(BuildContext context) {
-    return ListTile(
-        minLeadingWidth: 10,
-        leading: Icon(
-          route.value,
-          color: Colors.white,
-        ),
-        title: Text(route.key.name.toUpperCase(),
-            style: const TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-              fontSize: 20,
-            )),
-        onTap: () => context.go("/${route.key.name}"));
   }
 }

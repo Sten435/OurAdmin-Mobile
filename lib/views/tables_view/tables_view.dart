@@ -1,4 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
+import 'package:ouradmin_mobile/bloc/databases/databases_bloc.dart';
+import 'package:ouradmin_mobile/domein/table.dart';
+import 'package:ouradmin_mobile/views/databases_view/widgets/database_list_view_card.dart';
+
+import '../../domein/database.dart';
 
 class TablesView extends StatefulWidget {
   const TablesView({super.key});
@@ -8,10 +15,22 @@ class TablesView extends StatefulWidget {
 }
 
 class _TablesViewState extends State<TablesView> {
-  final tableNames = List<String>.generate(10, (i) => "Item ${i + 1}");
-
   @override
   Widget build(BuildContext context) {
+    final databaseState = context.read<DatabaseBloc>().state;
+    final Database? selectedDatabase = databaseState.selectedDatabase;
+    final selectedTable = databaseState.selectedTable;
+
+    if (selectedDatabase == null) {
+      return Center(
+          child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+        const Text('No Database Selected', style: TextStyle(fontSize: 16)),
+        const SizedBox(height: 10),
+        ElevatedButton(onPressed: () => GoRouter.of(context).go('/'), child: const Text("Select Database")),
+      ]));
+    }
+
+    final tableNames = selectedDatabase.tables;
     return Flex(
       direction: Axis.vertical,
       children: [
@@ -19,33 +38,17 @@ class _TablesViewState extends State<TablesView> {
           child: ListView.builder(
             itemCount: tableNames.length,
             itemBuilder: (context, index) {
-              final tableName = tableNames[index];
-              return Container(
-                margin: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(4),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey.withOpacity(0.5),
-                      blurRadius: 5,
-                      blurStyle: BlurStyle.solid,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
+              final tableName = selectedDatabase.tables[index];
+              return GestureDetector(
+                child: CustomListViewCard(
+                  leading: tableName.name,
+                  tailingIcon: const Icon(Icons.delete_forever),
+                  leadingClick: () => {},
+                  selected: tableName.name == selectedTable?.name,
                 ),
-                child: ListTile(
-                  title: Text(tableName,
-                      style: const TextStyle(
-                          fontSize: 16, fontWeight: FontWeight.bold)),
-                  trailing: IconButton(
-                    onPressed: () => openConformationDialog(context, tableName),
-                    icon: const Icon(
-                      Icons.delete_forever,
-                      color: Colors.red,
-                    ),
-                  ),
-                ),
+                onTap: () {
+                  setSelectedTable(context, tableName);
+                },
               );
             },
           ),
@@ -77,9 +80,6 @@ class _TablesViewState extends State<TablesView> {
             ElevatedButton(
               onPressed: () {
                 Navigator.pop(context);
-                setState(() {
-                  tableNames.remove(tableName);
-                });
               },
               child: const Text('Delete'),
             ),
@@ -112,9 +112,6 @@ class _TablesViewState extends State<TablesView> {
             ElevatedButton(
               onPressed: () {
                 Navigator.pop(context);
-                setState(() {
-                  tableNames.add(textRef.text);
-                });
               },
               child: const Text('Add'),
             ),
@@ -122,5 +119,12 @@ class _TablesViewState extends State<TablesView> {
         );
       },
     );
+  }
+
+  void setSelectedTable(BuildContext context, DBTable? table) {
+    if (table == context.read<DatabaseBloc>().state.selectedTable) table = null;
+    setState(() {
+      context.read<DatabaseBloc>().add(SelectedTableChanged(table: table));
+    });
   }
 }

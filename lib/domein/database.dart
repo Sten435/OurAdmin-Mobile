@@ -3,61 +3,57 @@
 
 import 'dart:convert';
 
-import 'package:flutter/foundation.dart';
+import 'package:equatable/equatable.dart';
 
-import 'Table.dart';
-import 'connection_info.dart';
+import 'table.dart';
 
-class Database {
-  ConnectionInfo _connectionInfo;
-  List<DBTable> Tables = [];
-  String name;
+class Database extends Equatable {
+  List<DBTable> _tables = [];
+  List<DBTable> get tables => _tables;
 
-  Database(this._connectionInfo, this.name, {List<DBTable>? tables}) {
+  late String _name;
+  String get name => _name;
+
+  Database({required String name, required List<DBTable> tables}) {
+    setName(name);
     setTables(tables);
   }
 
-  void setTables(List<DBTable>? tables) {
-    if (tables == null) return;
-    Tables = tables;
+// #region: Tables
+  void setTables(List<DBTable> tables) {
+    _tables = tables;
   }
 
-// #region: ConnectionInfo
-  ConnectionInfo getConnectionInfo() {
-    return _connectionInfo;
+  void addTable(DBTable table) {
+    _tables.add(table);
   }
 
-  setConnectionInfo(ConnectionInfo connectionInfo) {
-    _connectionInfo = connectionInfo;
+  void removeTable(DBTable table) {
+    _tables.remove(table);
+  }
+
+  List<DBTable> getTables() {
+    return tables;
   }
 // #endregion
 
-// #region: Tables
-  addTable(DBTable table) {
-    Tables.add(table);
-  }
-
-  removeTable(DBTable table) {
-    Tables.remove(table);
-  }
-
-  getTables() {
-    return Tables;
+// #region: Name
+  void setName(String name) {
+    if (name.isEmpty) throw Exception("Database name cannot be empty");
+    _name = name;
   }
 // #endregion
 
 // #region: Mappers
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
-      '_connectionInfo': _connectionInfo.toMap(),
-      'Tables': Tables.map((x) => x.toMap()).toList(),
+      'Tables': tables.map((x) => x.toMap()).toList(),
     };
   }
 
   factory Database.fromMap(Map<String, dynamic> map) {
     return Database(
-      ConnectionInfo.fromMap(map['_connectionInfo'] as Map<String, dynamic>),
-      map['name'] as String,
+      name: map['name'] as String,
       tables: List<DBTable>.from(
         (map['Tables'] as List<int>).map<DBTable>(
           (x) => DBTable.fromMap(x as Map<String, dynamic>),
@@ -71,17 +67,8 @@ class Database {
   factory Database.fromJson(String source) => Database.fromMap(json.decode(source) as Map<String, dynamic>);
 // #endregion
 
-// #region: Equals
+// #region: Equatable
   @override
-  bool operator ==(covariant Database other) {
-    if (identical(this, other)) return true;
-
-    return other._connectionInfo == _connectionInfo && listEquals(other.Tables, Tables);
-  }
-
-  @override
-  int get hashCode {
-    return _connectionInfo.hashCode ^ Tables.hashCode;
-  }
+  List<Object?> get props => [tables, name];
 // #endregion
 }

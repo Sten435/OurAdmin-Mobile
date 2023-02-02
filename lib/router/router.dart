@@ -20,21 +20,34 @@ final GoRouter routerConfig = GoRouter(
   routes: <RouteBase>[
     GoRoute(
       path: '/',
-      builder: (BuildContext context, GoRouterState state) {
-        return page(ERoutes.database);
+      redirect: (context, state) {
+        if (state.fullpath == '/') {
+          return '/database';
+        }
+        return null;
       },
+      routes: [
+        ...ERoutes.values.map(
+          (route) => GoRoute(
+            path: route.name,
+            pageBuilder: (context, state) => NoTransitionPage<void>(
+              key: state.pageKey,
+              child: page(route),
+            ),
+          ),
+        )
+      ],
+      pageBuilder: (context, state) => NoTransitionPage<void>(
+        key: state.pageKey,
+        child: page(ERoutes.database),
+      ),
     ),
-    ...ERoutes.values.map((route) => GoRoute(
-        path: '/${route.name}',
-        builder: (BuildContext context, GoRouterState state) {
-          return page(route);
-        })),
   ],
 );
 
 page(ERoutes route) {
   final routes = <ERoutes, Widget>{
-    ERoutes.database: const DatabasesView(),
+    ERoutes.database: DatabasesView(),
     ERoutes.tables: const TablesView(),
     ERoutes.structure: const StructuurView(),
     ERoutes.query: QueryView(),

@@ -40,9 +40,11 @@ dependencies:
     another_flushbar: ^1.12.29
     flutter_highlight: ^0.7.0
     code_text_field: ^1.1.0
-    mysql_client: ^0.0.27
+    mysql1: ^0.20.0
     flutter_dotenv: ^5.0.2
-    davi: ^3.1.1
+    event_bus: ^2.0.0
+    equatable: ^2.0.3
+    flutter_bloc: ^8.0.1
 
 dev_dependencies:
     flutter_test:

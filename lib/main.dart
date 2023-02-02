@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:ouradmin_mobile/bloc/databases/databases_bloc.dart';
 import 'router/router.dart';
 
 void main() async {
@@ -12,10 +14,13 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp.router(
-      title: 'Flutter Demo',
-      theme: ThemeData(primarySwatch: Colors.brown),
-      routerConfig: routerConfig,
+    return BlocProvider(
+      create: (context) => DatabaseBloc(),
+      child: MaterialApp.router(
+        title: 'Flutter Demo',
+        theme: ThemeData(primarySwatch: Colors.brown),
+        routerConfig: routerConfig,
+      ),
     );
   }
 }

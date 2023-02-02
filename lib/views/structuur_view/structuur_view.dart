@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
+import 'package:ouradmin_mobile/bloc/databases/databases_bloc.dart';
 import 'package:ouradmin_mobile/domein/enums/db_key_type.dart';
 
 import '../../domein/column.dart';
+import '../../domein/database.dart';
+import '../../domein/table.dart';
 import '../../manager/structuur_manager.dart';
 import '../alert_popups/error_popups.dart';
 import 'widgets/custom_checkbox.dart';
@@ -15,14 +20,49 @@ class StructuurView extends StatefulWidget {
 }
 
 class _StructuurViewState extends State<StructuurView> {
-  final List<DBColumn> columns = List<DBColumn>.generate(
-    10,
-    (i) => DBColumn("Name: ${i + 1}", "Type: ${i + 1}",
-        keyType: null, isNullable: true),
-  );
-
   final typeNames = List<String>.generate(10, (i) => "Type: ${i + 1}");
   int? selectedIndex;
+  late List<DBColumn> columns;
+
+  @override
+  Widget build(BuildContext context) {
+    final DatabaseState databaseState = context.read<DatabaseBloc>().state;
+    final Database? selectedDatabase = databaseState.selectedDatabase;
+    final DBTable? selectedTable = databaseState.selectedTable;
+
+    if (selectedDatabase == null) {
+      return Center(
+          child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+        const Text('No Database Selected', style: TextStyle(fontSize: 16)),
+        const SizedBox(height: 10),
+        ElevatedButton(onPressed: () => GoRouter.of(context).go('/'), child: const Text("Select Database")),
+      ]));
+    }
+
+    if (selectedTable == null) {
+      return Center(
+          child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+        const Text('No Table Selected', style: TextStyle(fontSize: 16)),
+        const SizedBox(height: 10),
+        ElevatedButton(onPressed: () => GoRouter.of(context).go('/tables'), child: const Text("Select Table")),
+      ]));
+    }
+
+    columns = selectedTable.columns;
+
+    return Flex(
+      direction: Axis.vertical,
+      children: [
+        Expanded(
+          child: ListView.builder(
+            itemCount: columns.length,
+            itemBuilder: (context, index) => columnListTile(index, columns[index]),
+          ),
+        ),
+        footerButtons(),
+      ],
+    );
+  }
 
   Container columnListTile(int index, DBColumn column) {
     return Container(
@@ -31,9 +71,7 @@ class _StructuurViewState extends State<StructuurView> {
         color: Colors.white,
         borderRadius: BorderRadius.circular(4),
         border: Border.all(
-          color: selectedIndex == index
-              ? Colors.brown.shade500
-              : Colors.transparent,
+          color: selectedIndex == index ? Colors.brown.shade500 : Colors.transparent,
           width: 2,
         ),
         boxShadow: [
@@ -55,13 +93,9 @@ class _StructuurViewState extends State<StructuurView> {
             }
           });
         },
-        title: Text(column.Name,
-            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+        title: Text(column.name, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
         subtitle: Text(
-          "${column.Type},${column.KeyType?.name ?? ""},${column.IsNullable == true ? "null" : ""}"
-              .split(",")
-              .where((s) => s.isNotEmpty)
-              .join(" - "),
+          "${column.type},${column.keyType?.name ?? ""},${column.isNullable == true ? "null" : ""}".split(",").where((s) => s.isNotEmpty).join(" - "),
         ),
         trailing: selectedIndex == index
             ? RawMaterialButton(
@@ -93,13 +127,11 @@ class _StructuurViewState extends State<StructuurView> {
               ),
               if (selectedIndex != null)
                 ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.orange.shade600),
+                  style: ElevatedButton.styleFrom(backgroundColor: Colors.orange.shade600),
                   onPressed: () {
                     columnDialog(column: columns[selectedIndex!]);
                   },
-                  child:
-                      const Text('Edit Column', style: TextStyle(fontSize: 20)),
+                  child: const Text('Edit Column', style: TextStyle(fontSize: 20)),
                 ),
             ],
           ),
@@ -114,7 +146,7 @@ class _StructuurViewState extends State<StructuurView> {
       builder: (context) {
         return AlertDialog(
           title: const Text('Delete Column'),
-          content: Text('Are you sure you wanna delete:\n\n\n- ${column.Name}'),
+          content: Text('Are you sure you wanna delete:\n\n\n- ${column.name}'),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
@@ -140,10 +172,10 @@ class _StructuurViewState extends State<StructuurView> {
     showBottomSheet(
         context: context,
         builder: (context) {
-          String? type = column?.Type;
-          String? name = column?.Name;
-          DBKeyType? keyType = column?.KeyType;
-          bool isNullable = column?.IsNullable ?? true;
+          String? type = column?.type;
+          String? name = column?.name;
+          DBKeyType? keyType = column?.keyType;
+          bool isNullable = column?.isNullable ?? true;
           final formKey = GlobalKey<FormState>();
 
           return Scaffold(
@@ -159,13 +191,13 @@ class _StructuurViewState extends State<StructuurView> {
                   Navigator.pop(context);
 
                   final newColumn = DBColumn(
-                    name!,
-                    type!,
+                    name: name!,
+                    type: type!,
                     keyType: keyType,
                     isNullable: isNullable,
                   );
 
-                  String message = "Added ${newColumn.Name}";
+                  String message = "Added ${newColumn.name}";
 
                   if (column == null) {
                     StructuurManager.addColumn(newColumn);
@@ -180,7 +212,7 @@ class _StructuurViewState extends State<StructuurView> {
                         columns.remove(column);
                         columns.add(newColumn);
                       });
-                      message = "Edited ${newColumn.Name}";
+                      message = "Edited ${newColumn.name}";
                     } else {
                       message = "Nothing changed";
                     }
@@ -206,7 +238,7 @@ class _StructuurViewState extends State<StructuurView> {
                             )),
                         const SizedBox(height: 20),
                         TextFormField(
-                          initialValue: column?.Name,
+                          initialValue: column?.name,
                           onChanged: (value) => name = value,
                           validator: (value) {
                             if (value == null || value.isEmpty) {
@@ -214,32 +246,26 @@ class _StructuurViewState extends State<StructuurView> {
                             }
                             return null;
                           },
-                          decoration: const InputDecoration(
-                              border: OutlineInputBorder(), labelText: 'Name'),
+                          decoration: const InputDecoration(border: OutlineInputBorder(), labelText: 'Name'),
                         ),
                         const SizedBox(height: 20),
                         CustomComboBox(
                           typeNames,
-                          selectedItem: column?.Type,
+                          selectedItem: column?.type,
                           placeholder: "Type",
                           borderText: "Type",
                           onChanged: (value) => setState(() => type = value),
                         ),
                         const SizedBox(height: 20),
                         CustomComboBox(
-                          selectedItem: column?.KeyType?.name,
+                          selectedItem: column?.keyType?.name,
                           DBKeyType.values.map((e) => e.name).toList(),
                           placeholder: "Key",
                           borderText: "Key",
-                          onChanged: (value) => setState(() => keyType =
-                              DBKeyType.values.firstWhere(
-                                  (element) => element.name == value)),
+                          onChanged: (value) => setState(() => keyType = DBKeyType.values.firstWhere((element) => element.name == value)),
                         ),
                         const SizedBox(height: 20),
-                        CustomCheckBox("Nullable",
-                            defaultValue: isNullable,
-                            onChanged: (value) =>
-                                setState(() => isNullable = value)),
+                        CustomCheckBox("Nullable", defaultValue: isNullable, onChanged: (value) => setState(() => isNullable = value)),
                       ],
                     ),
                   ),
@@ -248,22 +274,5 @@ class _StructuurViewState extends State<StructuurView> {
             ),
           );
         });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Flex(
-      direction: Axis.vertical,
-      children: [
-        Expanded(
-          child: ListView.builder(
-            itemCount: columns.length,
-            itemBuilder: (context, index) =>
-                columnListTile(index, columns[index]),
-          ),
-        ),
-        footerButtons(),
-      ],
-    );
   }
 }

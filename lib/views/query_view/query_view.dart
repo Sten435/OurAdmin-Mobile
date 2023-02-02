@@ -21,8 +21,7 @@ class _QueryViewState extends State<QueryView> {
   void initState() {
     super.initState();
 
-    var defaultStyle =
-        TextStyle(color: Colors.brown.shade800, fontWeight: FontWeight.bold);
+    var defaultStyle = TextStyle(color: Colors.brown.shade800, fontWeight: FontWeight.bold);
 
     _codeController = CodeController(text: widget.queryText, stringMap: {
       "'": defaultStyle,
@@ -236,8 +235,7 @@ class _QueryViewState extends State<QueryView> {
                 background: Colors.transparent,
                 textSelectionTheme: TextSelectionThemeData(
                   cursorColor: Colors.black,
-                  selectionColor:
-                      Theme.of(context).primaryColor.withOpacity(.5),
+                  selectionColor: Theme.of(context).primaryColor.withOpacity(.5),
                   selectionHandleColor: Colors.black,
                 ),
                 textStyle: TextStyle(
@@ -269,8 +267,7 @@ class _QueryViewState extends State<QueryView> {
                   alignment: Alignment.center,
                   child: ElevatedButton(
                     onPressed: () => executeQuery(context),
-                    child:
-                        const Text("Execute", style: TextStyle(fontSize: 24)),
+                    child: const Text("Execute", style: TextStyle(fontSize: 24)),
                   )),
             )
           ],

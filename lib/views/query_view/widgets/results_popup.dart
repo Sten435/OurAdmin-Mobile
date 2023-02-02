@@ -1,12 +1,10 @@
-import 'package:davi/davi.dart';
 import 'package:flutter/material.dart';
-import 'package:mysql_client/mysql_client.dart';
+import 'package:mysql1/mysql1.dart';
 
 class ResultPopup extends StatefulWidget {
   ResultPopup(this.queryResult, {super.key});
 
   Future<QueryResult> queryResult;
-  late DaviModel<Map<String, String?>>? _model;
 
   @override
   State<ResultPopup> createState() => _ResultPopupState();
@@ -57,41 +55,30 @@ class _ResultPopupState extends State<ResultPopup> {
                       if (snapshot.data == null) {
                         return const Text("No Results");
                       }
-                      var data = snapshot.data!.results as List<ResultSetRow>;
-                      List<Iterable<String?>>? rows = data
-                          .map((e) => e.assoc().entries.map((e) => e.value))
-                          .toList();
-                      var columns = data.first
-                          .assoc()
-                          .keys
-                          .map((e) => DataColumn(label: Text(e)))
-                          .toList();
+                      var data = snapshot.data!.results as List<ResultRow>;
 
-                      return ListView(
+                      var rows = data.map((e) => e.fields.values.toList()).toList();
+                      var columns = data[0].fields.keys.map((e) => DataColumn(label: Text(e))).toList();
+
+                      return SingleChildScrollView(
                         scrollDirection: Axis.horizontal,
-                        children: [
-                          SingleChildScrollView(
-                            child: DataTable(
-                                border: TableBorder.all(
-                                    color:
-                                        Theme.of(context).colorScheme.primary,
-                                    width: 2),
-                                columns: columns,
-                                rows: rows
-                                    .map((e) => DataRow(
-                                        cells: e
-                                            .map((e) => DataCell(
-                                                  Padding(
-                                                    padding:
-                                                        const EdgeInsets.all(
-                                                            8.0),
-                                                    child: Text(e.toString()),
-                                                  ),
-                                                ))
-                                            .toList()))
-                                    .toList()),
-                          ),
-                        ],
+                        child: SingleChildScrollView(
+                          scrollDirection: Axis.vertical,
+                          child: DataTable(
+                              border: TableBorder.all(color: Theme.of(context).colorScheme.primary, width: 2),
+                              columns: columns,
+                              rows: rows
+                                  .map((e) => DataRow(
+                                      cells: e
+                                          .map((e) => DataCell(
+                                                Padding(
+                                                  padding: const EdgeInsets.all(8.0),
+                                                  child: Text(e.toString()),
+                                                ),
+                                              ))
+                                          .toList()))
+                                  .toList()),
+                        ),
                       );
                     } else {
                       return const Center(child: CircularProgressIndicator());
@@ -119,8 +106,14 @@ class _ResultPopupState extends State<ResultPopup> {
 }
 
 class QueryResult {
-  bool hasData;
+  late bool hasData;
   dynamic results;
 
-  QueryResult({required this.hasData, required this.results});
+  QueryResult({required this.results}) {
+    if (results != null) {
+      hasData = true;
+    } else {
+      hasData = false;
+    }
+  }
 }
