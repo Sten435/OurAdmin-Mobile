@@ -1,6 +1,8 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:convert';
 
 import 'package:equatable/equatable.dart';
+
 import 'package:ouradmin_mobile/domein/enums/db_key_type.dart';
 
 class DBColumn extends Equatable {
@@ -24,9 +26,9 @@ class DBColumn extends Equatable {
   }
 
 // #region: Name
-  void setName(name) {
-    if (name.isEmpty) throw Exception("Column name cannot be empty");
-    _name = name;
+  void setName(String name) {
+    if (name.trim().isEmpty) throw Exception("Column name cannot be empty");
+    _name = name.trim();
   }
 // #endregion
 
@@ -46,6 +48,22 @@ class DBColumn extends Equatable {
 // #region: IsNullable
   void setIsNullable(bool isNullable) {
     _isNullable = isNullable;
+  }
+// #endregion
+
+// #region: CopyWith
+  DBColumn copyWith({
+    String? name,
+    String? type,
+    DBKeyType? keyType,
+    bool? isNullable,
+  }) {
+    return DBColumn(
+      name: name ?? _name,
+      type: type ?? _type,
+      keyType: keyType ?? _keyType,
+      isNullable: isNullable ?? (_isNullable ?? false),
+    );
   }
 // #endregion
 

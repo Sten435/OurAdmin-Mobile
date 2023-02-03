@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:ouradmin_mobile/database/databases_repo.dart';
-import 'package:ouradmin_mobile/views/databases_view/widgets/database_list_view_card.dart';
+import 'package:ouradmin_mobile/custom_widgets/custom_list_view_card.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../bloc/databases/databases_bloc.dart';

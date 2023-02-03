@@ -17,6 +17,7 @@ enum ERoutes {
 }
 
 final GoRouter routerConfig = GoRouter(
+  navigatorKey: GlobalKey<NavigatorState>(),
   routes: <RouteBase>[
     GoRoute(
       path: '/',
@@ -47,7 +48,7 @@ final GoRouter routerConfig = GoRouter(
 
 page(ERoutes route) {
   final routes = <ERoutes, Widget>{
-    ERoutes.database: DatabasesView(),
+    ERoutes.database: const DatabasesView(),
     ERoutes.tables: const TablesView(),
     ERoutes.structure: const StructuurView(),
     ERoutes.query: QueryView(),

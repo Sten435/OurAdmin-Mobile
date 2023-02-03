@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ouradmin_mobile/bloc/databases/databases_bloc.dart';
 import 'package:ouradmin_mobile/domein/table.dart';
-import 'package:ouradmin_mobile/views/databases_view/widgets/database_list_view_card.dart';
+import 'package:ouradmin_mobile/custom_widgets/custom_list_view_card.dart';
 
 import '../../domein/database.dart';
 

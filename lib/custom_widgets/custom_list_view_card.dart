@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 
 class CustomListViewCard extends StatelessWidget {
-  CustomListViewCard({super.key, required this.leading, required this.tailingIcon, required this.leadingClick, bool? selected}) {
+  CustomListViewCard({super.key, required this.leading, required this.tailingIcon, required this.leadingClick, bool? selected, this.subLeading}) {
     this.selected = selected ?? false;
   }
   String leading;
+  String? subLeading;
   Widget? tailingIcon;
   bool selected = false;
   Function() leadingClick;
@@ -31,16 +32,32 @@ class CustomListViewCard extends StatelessWidget {
       padding: const EdgeInsets.all(10),
       margin: const EdgeInsets.all(10),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(leading, overflow: TextOverflow.ellipsis, maxLines: 1, softWrap: false, style: const TextStyle(fontSize: 24)),
-          const Divider(color: Colors.white24, thickness: 1),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(leading, overflow: TextOverflow.ellipsis, maxLines: 1, softWrap: false, style: const TextStyle(fontSize: 24)),
+                  ],
+                ),
+                subLeading != null
+                    ? Padding(
+                        padding: const EdgeInsets.only(top: 8),
+                        child: Text(subLeading!, overflow: TextOverflow.ellipsis, maxLines: 1, softWrap: false, style: const TextStyle(fontSize: 16)),
+                      )
+                    : const SizedBox(),
+              ],
+            ),
+          ),
           selected
               ? Icon(Icons.check_circle_outline_rounded, color: Theme.of(context).colorScheme.primary)
               : GestureDetector(
                   onTap: () => leadingClick(),
                   child: tailingIcon,
-                ),
+                )
         ],
       ),
     );
