@@ -1,15 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:ouradmin_mobile/database/databases_repo.dart';
+import 'package:go_router/go_router.dart';
 import 'package:ouradmin_mobile/custom_widgets/custom_list_view_card.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:ouradmin_mobile/manager/databases_manager.dart';
 
 import '../../bloc/databases/databases_bloc.dart';
+import '../../error/database_connection_error.dart';
 import '../../domein/database.dart';
 import '../alert_popups/error_popups.dart';
 import '../alert_popups/success_popup.dart';
 
 class DatabasesView extends StatefulWidget {
-  const DatabasesView({super.key});
+  DatabasesView({super.key});
+  List<Database> databases = [];
 
   @override
   State<DatabasesView> createState() => _DatabasesViewState();
@@ -17,14 +20,20 @@ class DatabasesView extends StatefulWidget {
 
 class _DatabasesViewState extends State<DatabasesView> {
   @override
-  Widget build(BuildContext context) {
-    var databases = context.read<DatabaseBloc>().state.databases;
-    if (databases.isEmpty) {
-      getDatabases().then((value) {
+  void initState() {
+    super.initState();
+    widget.databases = context.read<DatabaseBloc>().state.databases;
+    if (widget.databases.isEmpty) {
+      getDatabases(context).then((value) {
         setState(() => context.read<DatabaseBloc>().add(DatabasesChanged(databases: value)));
+      }).onError((e, stackTrace) {
+        showErrorBar(context, e.toString(), duration: const Duration(seconds: 30));
       });
-      return const Center(child: CircularProgressIndicator());
     }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return SizedBox(
       width: double.infinity,
       height: double.infinity,
@@ -32,12 +41,12 @@ class _DatabasesViewState extends State<DatabasesView> {
         builder: (context, state) {
           Database? selectedDatabase = state.selectedDatabase;
           return ListView.builder(
-            itemCount: databases.length,
+            itemCount: widget.databases.length,
             itemBuilder: (context, index) {
               return GestureDetector(
-                child: CustomListViewCard(leading: databases[index].name, tailingIcon: const Icon(Icons.delete_forever), selected: databases[index].name == selectedDatabase?.name, leadingClick: () => deleteDatabase(databases[index])),
+                child: CustomListViewCard(leading: widget.databases[index].name, tailingIcon: const Icon(Icons.delete_forever), selected: widget.databases[index].name == selectedDatabase?.name, leadingClick: () => deleteDatabase(widget.databases[index])),
                 onTap: () {
-                  selectDatabase(databases[index]);
+                  selectDatabase(widget.databases[index]);
                 },
               );
             },
@@ -47,8 +56,20 @@ class _DatabasesViewState extends State<DatabasesView> {
     );
   }
 
-  Future<List<Database>> getDatabases() {
-    return DatabasesRepo.getDatabases();
+  Future<List<Database>> getDatabases(BuildContext context) {
+    try {
+      var connectionInfo = context.read<DatabaseBloc>().state.connectionInfo;
+      if (connectionInfo == null) {
+        GoRouter.of(context).go('/');
+        throw DatabaseConnectionError(message: "No server connected");
+      }
+      return DatabasesManager.getDatabases(connectionInfo: connectionInfo);
+    } catch (e) {
+      if (e is DatabaseConnectionError) {
+        showErrorBar(context, e.toString());
+      }
+      return Future.value([]);
+    }
   }
 
   deleteDatabase(Database database) {
@@ -65,7 +86,9 @@ class _DatabasesViewState extends State<DatabasesView> {
           TextButton(
             onPressed: () async {
               closePopup();
-              bool isDeleted = await DatabasesRepo.deleteDatabase(database);
+              var connectionInfo = context.read<DatabaseBloc>().state.connectionInfo;
+              if (connectionInfo == null) throw DatabaseConnectionError(message: "No server connected");
+              bool isDeleted = await DatabasesManager.deleteDatabase(database: database, connectionInfo: connectionInfo);
               if (!mounted) return;
               if (isDeleted) {
                 showSuccessBar(context, "Database ${database.name} deleted");

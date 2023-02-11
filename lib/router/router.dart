@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
+
 import 'package:ouradmin_mobile/views/custom_app_bar/custom_app_bar.dart';
 import 'package:ouradmin_mobile/views/custom_drawer_view/custom_drawer_view.dart';
 import 'package:ouradmin_mobile/views/databases_view/databases_view.dart';
 import 'package:ouradmin_mobile/views/query_view/query_view.dart';
+import 'package:ouradmin_mobile/views/server_view/server_view.dart';
 import 'package:ouradmin_mobile/views/structuur_view/structuur_view.dart';
 import 'package:ouradmin_mobile/views/tables_view/tables_view.dart';
 
 enum ERoutes {
+  server,
   database,
   tables,
   structure,
@@ -23,7 +26,7 @@ final GoRouter routerConfig = GoRouter(
       path: '/',
       redirect: (context, state) {
         if (state.fullpath == '/') {
-          return '/database';
+          return '/server';
         }
         return null;
       },
@@ -40,7 +43,7 @@ final GoRouter routerConfig = GoRouter(
       ],
       pageBuilder: (context, state) => NoTransitionPage<void>(
         key: state.pageKey,
-        child: page(ERoutes.database),
+        child: page(ERoutes.server),
       ),
     ),
   ],
@@ -48,7 +51,8 @@ final GoRouter routerConfig = GoRouter(
 
 page(ERoutes route) {
   final routes = <ERoutes, Widget>{
-    ERoutes.database: const DatabasesView(),
+    ERoutes.server: ServerView(),
+    ERoutes.database: DatabasesView(),
     ERoutes.tables: const TablesView(),
     ERoutes.structure: const StructuurView(),
     ERoutes.query: QueryView(),

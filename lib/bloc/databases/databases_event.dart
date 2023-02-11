@@ -7,6 +7,11 @@ class DatabasesChanged extends DatabaseEvent {
   final List<Database> databases;
 }
 
+class SelectedServerChanged extends DatabaseEvent {
+  SelectedServerChanged({required this.connectionInfo});
+  final ConnectionInfo? connectionInfo;
+}
+
 class SelectedDatabaseChanged extends DatabaseEvent {
   SelectedDatabaseChanged({required this.database});
   final Database? database;

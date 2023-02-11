@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:ouradmin_mobile/bloc/databases/databases_bloc.dart';
 
-import '../../custom_widgets/custom_list_view_card.dart';
-import '../../domein/column.dart';
-import '../../domein/database.dart';
-import '../../domein/table.dart';
-import '../../manager/structuur_manager.dart';
-import '../alert_popups/error_popups.dart';
+import 'package:ouradmin_mobile/bloc/databases/databases_bloc.dart';
+import 'package:ouradmin_mobile/custom_widgets/custom_list_view_card.dart';
+import 'package:ouradmin_mobile/domein/column.dart';
+import 'package:ouradmin_mobile/domein/database.dart';
+import 'package:ouradmin_mobile/domein/table.dart';
+import 'package:ouradmin_mobile/manager/structuur_manager.dart';
+import 'package:ouradmin_mobile/views/alert_popups/error_popups.dart';
 
 class StructuurView extends StatefulWidget {
   const StructuurView({super.key});
@@ -119,7 +119,9 @@ class _StructuurViewState extends State<StructuurView> {
             ElevatedButton(
               onPressed: () async {
                 try {
-                  await StructuurManager.deleteColumn(table, column);
+                  var connectionInfo = context.read<DatabaseBloc>().state.connectionInfo;
+                  if (connectionInfo == null) throw Exception("No server connected");
+                  await StructuurManager.deleteColumn(table, column, connectionInfo);
                   if (!mounted) return;
                   Navigator.pop(context);
                   setState(() {
@@ -165,7 +167,9 @@ class _StructuurViewState extends State<StructuurView> {
                     newColumn = column.copyWith(name: name);
                     if (column != newColumn) {
                       try {
-                        await StructuurManager.editColumn(table, column, newColumn);
+                        var connectionInfo = context.read<DatabaseBloc>().state.connectionInfo;
+                        if (connectionInfo == null) throw Exception("No server connected");
+                        await StructuurManager.editColumn(table, column, newColumn, connectionInfo);
                         if (!mounted) return;
                         setState(() {
                           var index = columns.indexOf(column);

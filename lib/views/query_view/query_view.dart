@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 
 import '../../manager/query_manader.dart';
 import '../alert_popups/error_popups.dart';
-import 'widgets/results_popup.dart';
+import 'results_popup.dart';
 
 class QueryView extends StatefulWidget {
   String queryText = "";
@@ -279,7 +279,7 @@ class _QueryViewState extends State<QueryView> {
     if (text.isEmpty) return;
 
     try {
-      var queryResult = QueryManager.executeQuery(text);
+      var queryResult = QueryManager.executeQuery(text, context);
       showBottomSheet(
           context: context,
           backgroundColor: Theme.of(context).colorScheme.background,

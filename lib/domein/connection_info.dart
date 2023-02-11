@@ -1,8 +1,11 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:convert';
 
-class ConnectionInfo {
+import 'package:equatable/equatable.dart';
+
+class ConnectionInfo extends Equatable {
   late String _host;
+
   String get host => _host;
 
   late int _port;
@@ -14,7 +17,10 @@ class ConnectionInfo {
   late String _password;
   String get password => _password;
 
-  ConnectionInfo(host, port, username, password) {
+  late String? database;
+  String? get databaseName => database;
+
+  ConnectionInfo({required String host, required int port, required String username, required String password, this.database}) {
     setHost(host);
     setPort(port);
     setUsername(username);
@@ -61,15 +67,18 @@ class ConnectionInfo {
 
   factory ConnectionInfo.fromMap(Map<String, dynamic> map) {
     return ConnectionInfo(
-      map['host'] as String,
-      map['port'] as int,
-      map['username'] as String,
-      map['password'] as String,
+      host: map['host'] as String,
+      port: map['port'] as int,
+      username: map['username'] as String,
+      password: map['password'] as String,
     );
   }
 
   String toJson() => json.encode(toMap());
 
   factory ConnectionInfo.fromJson(String source) => ConnectionInfo.fromMap(json.decode(source) as Map<String, dynamic>);
+
+  @override
+  List<Object?> get props => [host, port, username, password];
 // #endregion
 }

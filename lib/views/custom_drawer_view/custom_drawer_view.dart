@@ -15,6 +15,7 @@ class CustomDrawer extends StatefulWidget {
 
 class _CustomDrawerState extends State<CustomDrawer> {
   Map<ERoutes, IconData> routesDictionary = {
+    ERoutes.server: Icons.electrical_services_rounded,
     ERoutes.database: Icons.data_saver_off,
     ERoutes.tables: Icons.table_view,
     ERoutes.structure: Icons.table_rows,

@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:ouradmin_mobile/bloc/databases/databases_bloc.dart';
 import 'router/router.dart';
 
 void main() async {
   await dotenv.load(fileName: "lib/.env");
+  await GetStorage.init();
   runApp(const MyApp());
 }
 

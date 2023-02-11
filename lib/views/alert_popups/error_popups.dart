@@ -1,7 +1,7 @@
 import 'package:another_flushbar/flushbar.dart';
 import 'package:flutter/material.dart';
 
-void showErrorBar(context, String text, {Function? callback}) {
+void showErrorBar(context, String text, {Function? callback, Duration duration = const Duration(seconds: 5)}) {
   Flushbar(
     messageText: Text(
       text.toString(),
@@ -15,7 +15,7 @@ void showErrorBar(context, String text, {Function? callback}) {
       size: 28.0,
       color: Colors.red,
     ),
-    duration: const Duration(seconds: 5),
+    duration: duration,
     onStatusChanged: (status) => {if (status == FlushbarStatus.DISMISSED && callback != null) callback()},
     showProgressIndicator: true,
     backgroundColor: Colors.black,
