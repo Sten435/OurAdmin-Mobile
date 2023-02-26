@@ -8,6 +8,12 @@ import 'router/router.dart';
 void main() async {
   await dotenv.load(fileName: "lib/.env");
   await GetStorage.init();
+  ErrorWidget.builder = (FlutterErrorDetails details) => Center(
+        child: Text(
+          details.exceptionAsString(),
+          style: const TextStyle(color: Colors.red),
+        ),
+      );
   runApp(const MyApp());
 }
 

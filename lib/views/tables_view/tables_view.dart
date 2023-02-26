@@ -42,8 +42,8 @@ class _TablesViewState extends State<TablesView> {
               return GestureDetector(
                 child: CustomListViewCard(
                   leading: tableName.name,
-                  tailingIcon: const Icon(Icons.delete_forever),
-                  leadingClick: () => {},
+                  tailingIcon: const Icon(Icons.circle_outlined),
+                  leadingClick: null,
                   selected: tableName.name == selectedTable?.name,
                 ),
                 onTap: () {
@@ -53,71 +53,7 @@ class _TablesViewState extends State<TablesView> {
             },
           ),
         ),
-        const Divider(color: Colors.brown, height: 0, thickness: 2),
-        Padding(
-          padding: const EdgeInsets.all(10.0),
-          child: ElevatedButton(
-            onPressed: () => opennewTableDialog(context),
-            child: const Text('Add Table', style: TextStyle(fontSize: 20)),
-          ),
-        ),
       ],
-    );
-  }
-
-  openConformationDialog(BuildContext context, String tableName) {
-    return showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text('Delete Table'),
-          content: Text('Are you sure you wanna delete:\n\n\n- $tableName'),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Back'),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              child: const Text('Delete'),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  opennewTableDialog(BuildContext context) {
-    return showDialog(
-      context: context,
-      builder: (context) {
-        final textRef = TextEditingController();
-        return AlertDialog(
-          title: const Text('Add Table'),
-          // ignore: prefer_const_constructors
-          content: TextField(
-            controller: textRef,
-            decoration: const InputDecoration(
-              border: OutlineInputBorder(),
-              labelText: 'Table Name',
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Back'),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              child: const Text('Add'),
-            ),
-          ],
-        );
-      },
     );
   }
 

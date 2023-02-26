@@ -27,8 +27,33 @@ class _ServerViewState extends State<ServerView> {
 
   @override
   Widget build(BuildContext context) {
+    if (widget.storedServers == null) {
+      final box = GetStorage();
+      setState(() {
+        widget.storedServers = box.read("servers") as Map<String, dynamic>? ?? {};
+      });
+    }
+
     final ConnectionInfo? selectedServer = context.read<DatabaseBloc>().state.connectionInfo;
     final servers = widget.storedServers?.keys.map((e) => ConnectionInfo.fromJson(widget.storedServers![e])).toList() ?? [];
+
+    if (servers.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Text('No servers added yet', style: TextStyle(fontSize: 20)),
+            const SizedBox(height: 10),
+            ElevatedButton(
+              onPressed: () async {
+                openAddServerDialog(context);
+              },
+              child: const Text('Add Server', style: TextStyle(fontSize: 20)),
+            ),
+          ],
+        ),
+      );
+    }
 
     void selectServer(ConnectionInfo? server) {
       if (server == selectedServer) server = null;
@@ -46,9 +71,9 @@ class _ServerViewState extends State<ServerView> {
                 return GestureDetector(
                     child: CustomListViewCard(
                       leading: servers[index].host,
-                      tailingIcon: const Icon(Icons.settings),
+                      tailingIcon: const Icon(Icons.delete),
                       selected: servers[index] == selectedServer,
-                      leadingClick: () => {},
+                      leadingClick: () => deleteServer(servers[index]),
                     ),
                     onTap: () => selectServer(servers[index]));
               }),
@@ -89,40 +114,42 @@ class _ServerViewState extends State<ServerView> {
         builder: (BuildContext context) {
           return AlertDialog(
             title: const Text('Add Server'),
-            content: Form(
-              key: key,
-              child: ListView(
-                children: [
-                  const SizedBox(height: 20),
-                  CustomInput(
-                    placeholder: "Host",
-                    onChange: (String value) {
-                      hostText = value.trim();
-                    },
-                  ),
-                  const SizedBox(height: 10),
-                  CustomInput(
-                    placeholder: "Port",
-                    numberOnly: true,
-                    onChange: (String value) {
-                      portText = value.trim();
-                    },
-                  ),
-                  const SizedBox(height: 10),
-                  CustomInput(
-                    placeholder: "Username",
-                    onChange: (String value) {
-                      usernameText = value.trim();
-                    },
-                  ),
-                  const SizedBox(height: 10),
-                  CustomInput(
-                    placeholder: "Password",
-                    onChange: (String value) {
-                      passwordText = value.trim();
-                    },
-                  ),
-                ],
+            content: SingleChildScrollView(
+              child: Form(
+                key: key,
+                child: Column(
+                  children: [
+                    const SizedBox(height: 2),
+                    CustomInput(
+                      placeholder: "Host",
+                      onChange: (String value) {
+                        hostText = value.trim();
+                      },
+                    ),
+                    const SizedBox(height: 10),
+                    CustomInput(
+                      placeholder: "Port",
+                      numberOnly: true,
+                      onChange: (String value) {
+                        portText = value.trim();
+                      },
+                    ),
+                    const SizedBox(height: 10),
+                    CustomInput(
+                      placeholder: "Username",
+                      onChange: (String value) {
+                        usernameText = value.trim();
+                      },
+                    ),
+                    const SizedBox(height: 10),
+                    CustomInput(
+                      placeholder: "Password",
+                      onChange: (String value) {
+                        passwordText = value.trim();
+                      },
+                    ),
+                  ],
+                ),
               ),
             ),
             actions: [
@@ -147,7 +174,7 @@ class _ServerViewState extends State<ServerView> {
                     Navigator.of(context).pop();
                     showSuccessBar(context, "Server added successfully");
                   } catch (e) {
-                    print(e);
+                    debugPrint(e.toString());
                     showErrorBar(context, "Error adding server");
                   }
                 },
@@ -156,5 +183,17 @@ class _ServerViewState extends State<ServerView> {
             ],
           );
         });
+  }
+
+  void deleteServer(ConnectionInfo server) {
+    var box = GetStorage();
+    var servers = box.read("servers") as Map<String, dynamic>?;
+    servers ??= {};
+
+    if (servers.containsKey(server.host)) {
+      servers.remove(server.host);
+    }
+
+    box.write("servers", servers).then((_) => setState(() => widget.storedServers = servers));
   }
 }

@@ -24,19 +24,6 @@ class DatabasesRepo {
     return databases;
   }
 
-  static Future<bool> deleteDatabase({required ConnectionInfo connectionInfo, required Database database}) async {
-    final query = "DROP DATABASE IF EXISTS `${database.name}`";
-
-    try {
-      var conn = await Db.getConnection(connectionInfo: connectionInfo);
-      await conn.query(query);
-
-      return true;
-    } catch (e) {
-      return false;
-    }
-  }
-
   static Future<List<DBTable>> _getTables({required ConnectionInfo connectionInfo, required String databaseName}) async {
     var query = "SELECT table_name FROM information_schema.tables WHERE table_schema = '$databaseName' ORDER BY table_name";
 

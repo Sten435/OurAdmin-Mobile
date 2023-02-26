@@ -19,8 +19,6 @@ class _CustomDrawerState extends State<CustomDrawer> {
     ERoutes.database: Icons.data_saver_off,
     ERoutes.tables: Icons.table_view,
     ERoutes.structure: Icons.table_rows,
-    ERoutes.query: Icons.table_chart,
-    ERoutes.about: Icons.accessibility_outlined,
   };
 
   @override

@@ -8,7 +8,7 @@ class CustomListViewCard extends StatelessWidget {
   String? subLeading;
   Widget? tailingIcon;
   bool selected = false;
-  Function() leadingClick;
+  Function()? leadingClick;
 
   @override
   Widget build(BuildContext context) {
@@ -55,7 +55,9 @@ class CustomListViewCard extends StatelessWidget {
           selected
               ? Icon(Icons.check_circle_outline_rounded, color: Theme.of(context).colorScheme.primary)
               : GestureDetector(
-                  onTap: () => leadingClick(),
+                  onTap: () {
+                    if (leadingClick != null) leadingClick!();
+                  },
                   child: tailingIcon,
                 )
         ],

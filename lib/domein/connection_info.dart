@@ -17,12 +17,13 @@ class ConnectionInfo extends Equatable {
   late String _password;
   String get password => _password;
 
-  late String? database;
-  String? get databaseName => database;
+  late String? _database;
+  String? get database => _database;
 
-  ConnectionInfo({required String host, required int port, required String username, required String password, this.database}) {
+  ConnectionInfo({required String host, required int port, required String username, required String password, String? database}) : _database = database {
     setHost(host);
     setPort(port);
+    setDatabase(database ?? '');
     setUsername(username);
     setPassword(password);
   }
@@ -31,6 +32,12 @@ class ConnectionInfo extends Equatable {
   void setHost(String host) {
     if (host.isEmpty) throw Exception('Host cannot be empty');
     _host = host;
+  }
+// #endregion
+
+// #region: Database
+  void setDatabase(String database) {
+    _database = database;
   }
 // #endregion
 
@@ -62,6 +69,7 @@ class ConnectionInfo extends Equatable {
       'port': port,
       'username': username,
       'password': password,
+      'database': database,
     };
   }
 
@@ -71,6 +79,7 @@ class ConnectionInfo extends Equatable {
       port: map['port'] as int,
       username: map['username'] as String,
       password: map['password'] as String,
+      database: map['database'] as String?,
     );
   }
 
@@ -79,6 +88,6 @@ class ConnectionInfo extends Equatable {
   factory ConnectionInfo.fromJson(String source) => ConnectionInfo.fromMap(json.decode(source) as Map<String, dynamic>);
 
   @override
-  List<Object?> get props => [host, port, username, password];
+  List<Object?> get props => [host, port, username, password, database];
 // #endregion
 }
